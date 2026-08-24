@@ -141,7 +141,14 @@ const scaleWrap = document.getElementById("scaleWrap");
 /* CSS의 @media (max-width: 768px)과 동일한 기준.
    이 폭 이하에서는 JS로 축소하지 않고, 반응형 레이아웃을 그대로 사용한다. */
 const MOBILE_BREAKPOINT = 768;
+/* rps 캡처 폭(700)이 모바일 반응형 분기점(768px) "아래"라서,
+   html2canvas가 만드는 가상 창 너비가 768 이하로 인식되면
+   실제 화면(데스크톱)에서는 안 쓰이는 모바일 전용 스타일
+   (셀 높이 38px, 열 너비 자동분배 등)이 저장 시에만 실수로 적용된다.
+   그래서 실제 표(#captureArea)는 700px로 그대로 두되,
+   html2canvas 전용 가상 창 너비만 768보다 크게 잡아 모바일 분기를 피한다. */
 const CAPTURE_WIDTHS = { rps: 700, lr: 1100 };
+const CAPTURE_WINDOW_WIDTHS = { rps: 900, lr: 1100 };
 function getCaptureWidth() {
     return CAPTURE_WIDTHS[currentTab];
 }
@@ -297,6 +304,14 @@ function createTable() {
     });
 
     table.appendChild(head);
+
+    /* table-layout: fixed에서 셀 비율(가로 120 x 세로 68)을 항상 지키려면
+       table 자체의 width가 "첫 열 140px + 보이는 열 수 x 120px"이어야 한다.
+       (표시되는 열이 몇 개든 셀 폭이 620px 안에서 균등 분배되며 늘어나지 않도록,
+       실제 width 계산은 CSS의 calc(140px + var(--col-count) * 120px)에서 하고
+       여기서는 그 변수(열 개수)만 채워준다. 모바일 반응형에서는 이 값을
+       쓰지 않고 화면 폭에 맞춰 100%로 표시된다.) */
+    table.style.setProperty("--col-count", visibleColIndexes.length);
 
     visibleRowIndexes.forEach(rowIndex => {
         const tr = document.createElement("tr");
@@ -771,7 +786,7 @@ saveBtn.addEventListener("click", async () => {
             scale: 4,
             useCORS: true,
             logging: false,
-            windowWidth: getCaptureWidth(),
+            windowWidth: CAPTURE_WINDOW_WIDTHS[currentTab],
             windowHeight: Math.max(area.scrollHeight, 1600),
             /*
              * html2canvas는 textarea 안의 줄바꿈/자동 줄바꿈을 제대로
