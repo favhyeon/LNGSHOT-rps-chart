@@ -298,6 +298,14 @@ function createTable() {
 
     table.appendChild(head);
 
+    /* table-layout: fixed에서 셀 비율(가로 120 x 세로 68)을 항상 지키려면
+       table 자체의 width가 "첫 열 140px + 보이는 열 수 x 120px"이어야 한다.
+       (표시되는 열이 몇 개든 셀 폭이 620px 안에서 균등 분배되며 늘어나지 않도록,
+       실제 width 계산은 CSS의 calc(140px + var(--col-count) * 120px)에서 하고
+       여기서는 그 변수(열 개수)만 채워준다. 모바일 반응형에서는 이 값을
+       쓰지 않고 화면 폭에 맞춰 100%로 표시된다.) */
+    table.style.setProperty("--col-count", visibleColIndexes.length);
+
     visibleRowIndexes.forEach(rowIndex => {
         const tr = document.createElement("tr");
 

@@ -165,8 +165,10 @@ h1 {
 }
 
 table {
-    width: 100%;
-    max-width: 620px;
+    /* --col-count는 JS가 보이는 열 개수로 채워준다(기본값 4).
+       셀 비율(가로 120 x 세로 68)이 항상 유지되도록 표 폭 자체를
+       "첫 열 140px + 열 수 x 120px"로 고정한다. */
+    width: calc(140px + var(--col-count, 4) * 120px);
     margin: 0 auto;
     border-collapse: collapse;
     table-layout: fixed;
@@ -185,6 +187,10 @@ th {
 
 th:first-child {
     width: 140px;
+}
+
+th:not(:first-child) {
+    width: 120px;
 }
 
 .clickable-header {
@@ -788,6 +794,8 @@ button:hover {
         table-layout: fixed;
     }
 
+    /* 모바일에서는 화면 폭에 맞춰야 하므로 데스크톱용 고정 폭 계산(calc)을 쓰지 않는다. */
+
     th {
         height: 38px;
         font-size: 11px;
@@ -797,6 +805,10 @@ button:hover {
 
     th:first-child {
         width: 15%;
+    }
+
+    th:not(:first-child) {
+        width: auto;
     }
 
     td {
