@@ -32,10 +32,6 @@ const defaultPhotos = [
 /*
  * 표에 표시할 커플명.
  * [행 멤버][열 멤버] 순서.
- * 대각선(본인조합)은 각 멤버 씨피명을 두 번 합쳐서 만들었어요.
- * 씨피명(뉼·룰·닟·뤼)을 그대로 이어붙인 기본값이며,
- * 우진×률 조합만 닟 대신 딘을 사용해요(딘률 한정).
- * 원하는 조합명으로 자유롭게 바꿔서 쓰시면 돼요.
  */
 const pairNames = [
     ["뉼뉼", "뉼룰", "뉼닟", "뉼뤼"],
@@ -48,7 +44,7 @@ const options = [
     { name: "OTP",      color: "#f7cde0" },
     { name: "좋아함",   color: "#ffafaf" },
     { name: "호감",     color: "#fcee90" },
-    { name: "관심있음", color: "#baebbb" },
+    { name: "가능", color: "#baebbb" },
     { name: "관심없음", color: "#ffffff" },
     { name: "별로",     color: "#bfeefd" },
     { name: "지뢰",     color: "#999999" }
