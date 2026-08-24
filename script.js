@@ -23,10 +23,10 @@ const memberColors = [
 
 /* 멤버별 기본 프로필 사진 (members 배열과 순서 동일) */
 const defaultPhotos = [
-    "assets/members/oyul.png",
-    "assets/members/ryul.png",
-    "assets/members/woojin.png",
-    "assets/members/rui.png"
+    "assets/oyul.png",
+    "assets/ryul.png",
+    "assets/woojin.png",
+    "assets/rui.png"
 ];
 
 /*
