@@ -141,7 +141,10 @@ const scaleWrap = document.getElementById("scaleWrap");
 /* CSS의 @media (max-width: 768px)과 동일한 기준.
    이 폭 이하에서는 JS로 축소하지 않고, 반응형 레이아웃을 그대로 사용한다. */
 const MOBILE_BREAKPOINT = 768;
-const DESKTOP_CAPTURE_WIDTH = 1100;
+const CAPTURE_WIDTHS = { rps: 700, lr: 1100 };
+function getCaptureWidth() {
+    return CAPTURE_WIDTHS[currentTab];
+}
 
 let currentTarget = null; // { type: "cell", td } | { type: "row", index } | { type: "col", index }
 let currentTab = "rps";
@@ -768,7 +771,7 @@ saveBtn.addEventListener("click", async () => {
             scale: 4,
             useCORS: true,
             logging: false,
-            windowWidth: DESKTOP_CAPTURE_WIDTH,
+            windowWidth: getCaptureWidth(),
             windowHeight: Math.max(area.scrollHeight, 1600),
             /*
              * html2canvas는 textarea 안의 줄바꿈/자동 줄바꿈을 제대로
@@ -871,12 +874,13 @@ function fitCaptureArea() {
         return;
     }
 
-    const scale = Math.min(1, screenWidth / DESKTOP_CAPTURE_WIDTH);
+    const captureWidth = getCaptureWidth();
+    const scale = Math.min(1, screenWidth / captureWidth);
 
     area.style.transformOrigin = "top left";
     area.style.transform = `scale(${scale})`;
 
-    wrap.style.width = `${DESKTOP_CAPTURE_WIDTH * scale}px`;
+    wrap.style.width = `${captureWidth * scale}px`;
     wrap.style.height = `${area.scrollHeight * scale}px`;
 }
 

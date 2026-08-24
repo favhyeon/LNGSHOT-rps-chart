@@ -43,6 +43,13 @@ body {
     transform-origin: top left;
 }
 
+/* 샷페스(표) 탭은 표 자체 폭(620px)에 맞춰 카드 폭도 좁혀서
+   양옆 여백을 줄인다. 공수 탭(#captureAreaLr)은 그대로 넓게 유지. */
+#captureArea {
+    width: 700px;
+    padding: 28px 40px 34px;
+}
+
 /* ===========================
    탭 전환
 =========================== */
@@ -214,24 +221,26 @@ td:hover {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 24px;
+    flex-wrap: nowrap;
+    gap: 12px;
     margin-top: 25px;
 }
 
 .legend-item {
     display: flex;
     align-items: center;
-    gap: 9px;
-    font-size: 22px;
+    gap: 6px;
+    font-size: 16px;
     font-weight: 700;
+    white-space: nowrap;
 }
 
 .color {
-    width: 27px;
-    height: 27px;
+    width: 19px;
+    height: 19px;
     border-radius: 50%;
     border: 2px solid #d8d8d8;
+    flex: 0 0 auto;
 }
 
 .color.dashed {
