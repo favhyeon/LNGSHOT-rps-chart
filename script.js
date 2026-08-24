@@ -147,8 +147,8 @@ const MOBILE_BREAKPOINT = 768;
    (셀 높이 38px, 열 너비 자동분배 등)이 저장 시에만 실수로 적용된다.
    그래서 실제 표(#captureArea)는 700px로 그대로 두되,
    html2canvas 전용 가상 창 너비만 768보다 크게 잡아 모바일 분기를 피한다. */
-const CAPTURE_WIDTHS = { rps: 720, lr: 1100 };
-const CAPTURE_WINDOW_WIDTHS = { rps: 900, lr: 1100 };
+const CAPTURE_WIDTHS = { rps: 940, lr: 1100 };
+const CAPTURE_WINDOW_WIDTHS = { rps: 1200, lr: 1100 };
 function getCaptureWidth() {
     return CAPTURE_WIDTHS[currentTab];
 }
@@ -715,24 +715,63 @@ function saveLrData() {
     localStorage.setItem(LR_STORAGE_KEY, JSON.stringify(lrData));
 }
 
-/* 사진 업로드 */
-photoInput.addEventListener("change", (e) => {
+/* 사진 업로드
+   휴대폰 카메라 사진은 원본이 수천만 화소(수 MB)라서, 그대로 base64로 저장하면
+   - localStorage 용량을 금방 채우고
+   - 저장(html2canvas, scale 4) 시 원본 해상도 그대로 캔버스에 그려지며
+     메모리 부담이 커져 공수 취향표가 검정 화면으로 저장되는 원인이 된다.
+   그래서 화면에 실제 쓰이는 크기(원 150px)보다 넉넉한 선에서 축소 후 저장한다. */
+const AVATAR_MAX_SIZE = 480;
+
+function resizeImageFile(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            const img = new Image();
+
+            img.onload = () => {
+                const scale = Math.min(1, AVATAR_MAX_SIZE / Math.max(img.width, img.height));
+                const w = Math.max(1, Math.round(img.width * scale));
+                const h = Math.max(1, Math.round(img.height * scale));
+
+                const canvas = document.createElement("canvas");
+                canvas.width = w;
+                canvas.height = h;
+
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0, w, h);
+
+                resolve(canvas.toDataURL("image/jpeg", 0.85));
+            };
+
+            img.onerror = () => reject(new Error("이미지를 불러오지 못했습니다."));
+            img.src = reader.result;
+        };
+
+        reader.onerror = () => reject(new Error("파일을 읽지 못했습니다."));
+        reader.readAsDataURL(file);
+    });
+}
+
+photoInput.addEventListener("change", async (e) => {
     const file = e.target.files[0];
     if (!file || currentPhotoIndex === null) return;
 
-    const reader = new FileReader();
+    try {
+        const resizedDataUrl = await resizeImageFile(file);
 
-    reader.onload = () => {
-        lrData.photos[currentPhotoIndex] = reader.result;
+        lrData.photos[currentPhotoIndex] = resizedDataUrl;
         saveLrData();
 
         const avatarEl = lrGrid.querySelector(`.lr-avatar[data-index="${currentPhotoIndex}"] img`);
         if (avatarEl) {
-            avatarEl.src = reader.result;
+            avatarEl.src = resizedDataUrl;
         }
-    };
-
-    reader.readAsDataURL(file);
+    } catch (error) {
+        console.error(error);
+        alert("사진을 불러오는 중 문제가 발생했습니다.");
+    }
 });
 
 /* ==========================================
@@ -763,6 +802,25 @@ resetBtn.addEventListener("click", () => {
    이미지 저장
 ========================================== */
 
+/* html2canvas는 캡처 시점에 아직 로드가 끝나지 않은 <img>를
+   빈 칸(검정/투명 박스)으로 그려버릴 수 있다. 특히 공수 취향표는
+   프로필 사진이 여러 장이라 이 타이밍 문제가 잘 드러나므로,
+   저장 버튼을 누르면 캡처 영역 안의 모든 이미지가 실제로 로드
+   완료됐는지 먼저 기다린 뒤에 캡처를 시작한다. */
+function waitForImagesToLoad(root) {
+    const imgs = Array.from(root.querySelectorAll("img"));
+
+    return Promise.all(imgs.map(img => {
+        if (img.complete && img.naturalWidth !== 0) {
+            return Promise.resolve();
+        }
+        return new Promise(resolve => {
+            img.addEventListener("load", resolve, { once: true });
+            img.addEventListener("error", resolve, { once: true });
+        });
+    }));
+}
+
 saveBtn.addEventListener("click", async () => {
     const buttonWrap = document.querySelector(".button-wrap");
     const tabWrap = document.querySelector(".tab-wrap");
@@ -781,6 +839,8 @@ saveBtn.addEventListener("click", async () => {
     area.style.transform = "none";
 
     try {
+        await waitForImagesToLoad(area);
+
         const canvas = await html2canvas(area, {
             backgroundColor: "#ffffff",
             scale: 4,
