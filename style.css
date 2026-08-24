@@ -752,6 +752,14 @@ button:hover {
         box-shadow: 0 6px 20px rgba(0, 0, 0, .08);
     }
 
+    /* 데스크톱용 #captureArea(940px, 좌우 160px 패딩)가 ID 선택자라서
+       위 .capture-area 모바일 규칙보다 우선 적용되는 문제를 막기 위해
+       모바일 구간에서 명시적으로 다시 100%/좁은 패딩으로 되돌린다. */
+    #captureArea {
+        width: 100%;
+        padding: 20px 14px 22px;
+    }
+
     .logo {
         width: 160px;
         margin: 0 auto 2px;
