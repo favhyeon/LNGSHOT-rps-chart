@@ -147,7 +147,7 @@ const MOBILE_BREAKPOINT = 768;
    (셀 높이 38px, 열 너비 자동분배 등)이 저장 시에만 실수로 적용된다.
    그래서 실제 표(#captureArea)는 700px로 그대로 두되,
    html2canvas 전용 가상 창 너비만 768보다 크게 잡아 모바일 분기를 피한다. */
-const CAPTURE_WIDTHS = { rps: 700, lr: 1100 };
+const CAPTURE_WIDTHS = { rps: 720, lr: 1100 };
 const CAPTURE_WINDOW_WIDTHS = { rps: 900, lr: 1100 };
 function getCaptureWidth() {
     return CAPTURE_WIDTHS[currentTab];

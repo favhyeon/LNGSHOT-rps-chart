@@ -46,8 +46,8 @@ body {
 /* 샷페스(표) 탭은 표 자체 폭(620px)에 맞춰 카드 폭도 좁혀서
    양옆 여백을 줄인다. 공수 탭(#captureAreaLr)은 그대로 넓게 유지. */
 #captureArea {
-    width: 700px;
-    padding: 28px 40px 34px;
+    width: 720px;
+    padding: 28px 50px 34px;
 }
 
 /* ===========================
@@ -165,7 +165,7 @@ h1 {
 }
 
 table {
-    width: 100%;
+    width: calc(140px + var(--col-count, 4) * 120px);
     max-width: 620px;
     margin: 0 auto;
     border-collapse: collapse;
